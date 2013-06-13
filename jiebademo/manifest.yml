@@ -1,0 +1,17 @@
+---
+applications:
+  .:
+    name: jiebademo
+    framework:
+      name: wsgi
+      info:
+        mem: 64M
+        description: Python WSGI Application
+        exec: 
+    infra: ap-aws
+    url: ${name}.${target-base}
+    mem: 512M
+    instances: 1
+    services:
+      redis:
+        type: redis

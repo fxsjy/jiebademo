@@ -1,0 +1,63 @@
+<html>
+<head>
+	<title>Jieba Demo Site</title>
+</head>
+<body>
+<style type="text/css">
+	#Top{
+		text-align: center;
+		background-color: #000000;
+		color: #ffffff;
+		height: 30px;
+	}
+
+	#Wrapper{
+		text-align: center;
+	}
+
+	#Content{
+		width: 960px;
+		margin: 0 auto 0 auto;
+	}
+
+	#Bottom{
+		text-align: center;
+	}
+</style>
+
+<div id="Top">
+	<h2>Demo of Jieba</h2>
+</div>
+<div id="Wrapper">
+	<div id="Content">
+		<form action="/" method="post">
+		<div>
+			<textarea rows="15" cols="100" name="text">{{content}}</textarea>
+		</div>
+		<span>
+			<input type="radio" name="opt" value="1" {{selected(1)}}/>精确分词
+		</span>
+		<span>
+			<input type="radio" name="opt" value="2" {{selected(2)}}/>搜索引擎分词
+		</span>
+		<span>
+			<input type="radio" name="opt" value="3" {{selected(3)}}/>显示词性
+		</span>
+		<input type="submit" value="开始分词"/>
+		<input type="button" value="重置" onclick="javascript:window.location.href='/'"/>
+		<a href="/extract">关键词提取Demo</a>
+	</div>
+</form>
+</div>
+<div id="Bottom">
+	<span>项目主页：<a href="http://github.com/fxsjy/jieba">http://github.com/fxsjy/jieba</a></span>
+	<span>作者微博：<a href="http://weibo.com/TreapDB">http://weibo.com/TreapDB</a></span>
+</div>
+<div style="text-align: center;">
+	<script type="text/javascript">
+	var _bdhmProtocol = (("https:" == document.location.protocol) ? " https://" : " http://");
+	document.write(unescape("%3Cscript src='" + _bdhmProtocol + "hm.baidu.com/h.js%3F21954964d948ae1cf3c35471630f6fa7' type='text/javascript'%3E%3C/script%3E"));
+	</script>
+	</div>
+</body>
+</html>
