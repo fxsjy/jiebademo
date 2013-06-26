@@ -3,6 +3,10 @@ import os
 import viterbi
 import jieba
 import sys
+import prob_start
+import prob_trans
+import prob_emit
+import char_state_tab
 
 default_encoding = sys.getfilesystemencoding()
 
@@ -13,19 +17,14 @@ def load_model(f_name):
 		return eval(open(prob_p_path,"rb").read())
 	else:
 		result = {}
-		for line in open(prob_p_path,"rb"):
+		for line in open(f_name,"rb"):
 			line = line.strip()
 			if line=="":continue
 			word, _, tag = line.split(' ')
 			result[word.decode('utf-8')]=tag
 		return result
 
-
-prob_start = load_model("prob_start.py")
-prob_trans = load_model("prob_trans.py")
-prob_emit = load_model("prob_emit.py")
-char_state_tab = load_model("char_state_tab.py")
-word_tag_tab = load_model("../dict.txt")
+word_tag_tab = load_model(jieba.get_abs_path_dict())
 
 if jieba.user_word_tag_tab:
 	word_tag_tab.update(jieba.user_word_tag_tab)
@@ -48,7 +47,7 @@ class pair(object):
 		return self.__unicode__().encode(arg)
 
 def __cut(sentence):
-	prob, pos_list =  viterbi.viterbi(sentence,char_state_tab, prob_start, prob_trans, prob_emit)
+	prob, pos_list =  viterbi.viterbi(sentence,char_state_tab.P, prob_start.P, prob_trans.P, prob_emit.P)
 	begin, next = 0,0
 
 	for i,char in enumerate(sentence):
@@ -143,8 +142,7 @@ def __cut_internal(sentence):
 			tmp = re_skip.split(blk)
 			for x in tmp:
 				if re_skip.match(x):
-					if x.strip(' ')!='':
-						yield pair(x,'')
+					yield pair(x,'x')
 				else:
 					for xx in x:
 						if re_num.match(xx):

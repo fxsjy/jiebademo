@@ -3,7 +3,7 @@
 import os
 from bottle import route,run,default_app,request, response,get,post,template,debug,static_file
 import jieba
-jieba.set_dictionary("jieba/big.dict.txt")
+jieba.set_dictionary("jieba/dict.txt.big")
 jieba.initialize()
 from jieba import posseg
 import jieba.analyse

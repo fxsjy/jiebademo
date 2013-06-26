@@ -81,15 +81,20 @@ def initialize(*args):
 			FREQ = dict([(k,log(float(v)/total)) for k,v in FREQ.iteritems()]) #normalize
 			min_freq = min(FREQ.itervalues())
 			print >> sys.stderr, "dumping model to file cache " + cache_file
-			tmp_suffix = "."+str(random.random())
-			with open(cache_file+tmp_suffix,'wb') as temp_cache_file:
-				marshal.dump((trie,FREQ,total,min_freq),temp_cache_file)
-			if os.name=='nt':
-				import shutil
-				replace_file = shutil.move
-			else:
-				replace_file = os.rename
-			replace_file(cache_file+tmp_suffix,cache_file)
+			try:
+				tmp_suffix = "."+str(random.random())
+				with open(cache_file+tmp_suffix,'wb') as temp_cache_file:
+					marshal.dump((trie,FREQ,total,min_freq),temp_cache_file)
+				if os.name=='nt':
+					import shutil
+					replace_file = shutil.move
+				else:
+					replace_file = os.rename
+				replace_file(cache_file+tmp_suffix,cache_file)
+			except:
+				print >> sys.stderr, "dump cache file failed."
+				import traceback
+				print >> sys.stderr, traceback.format_exc()
 
 		initialized = True
 
@@ -222,14 +227,12 @@ def cut(sentence,cut_all=False):
 			tmp = re_skip.split(blk)
 			for x in tmp:
 				if re_skip.match(x):
-					if x.strip(' ')!='':
-						yield x
+					yield x
+				elif not cut_all:
+					for xx in x:
+						yield xx
 				else:
-					if not cut_all:
-						for xx in x:
-							yield xx
-					else:
-						yield x
+					yield x
 
 def cut_for_search(sentence):
 	words = cut(sentence)
@@ -285,7 +288,7 @@ def __lcut_for_search(sentence):
 def enable_parallel(processnum):
 	global pool,cut,cut_for_search
 	if os.name=='nt':
-		raise Exception("parallel mode only supports posix system")
+		raise Exception("jieba: parallel mode only supports posix system")
 
 	from multiprocessing import Pool
 	pool = Pool(processnum)
@@ -312,7 +315,7 @@ def enable_parallel(processnum):
 
 def disable_parallel():
 	global pool,cut,cut_for_search
-	if pool != None:
+	if 'pool' in globals():
 		pool.close()
 		pool = None
 	cut = __ref_cut
@@ -323,6 +326,20 @@ def set_dictionary(dictionary_path):
 	with DICT_LOCK:
 		abs_path = os.path.normpath( os.path.join( os.getcwd(), dictionary_path )  )
 		if not os.path.exists(abs_path):
-			raise Exception("path does not exists:" + abs_path)
+			raise Exception("jieba: path does not exists:" + abs_path)
 		DICTIONARY = abs_path
 		initialized = False
+
+def get_abs_path_dict():
+	_curpath=os.path.normpath( os.path.join( os.getcwd(), os.path.dirname(__file__) )  )
+	abs_path = os.path.join(_curpath,DICTIONARY)
+	return abs_path
+
+def tokenize(unicode_sentence):
+	if not isinstance(unicode_sentence, unicode):
+		raise Exception("jieba: the input parameter should  unicode.")
+	start = 0 
+	for w in cut(unicode_sentence):
+		width = len(w)
+		yield (w,start,start+width)
+		start+=width
